@@ -6,12 +6,14 @@ on:
       - 'v*'
 jobs:
   goreleaser:
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     steps:
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
-          go-version: 1.19
+          go-version: '1.19'
       - name: Checkout
         uses: actions/checkout@v3
       - name: Unshallow
@@ -26,7 +28,6 @@ jobs:
         with:
           version: latest
           args: release --clean
-        #  key: ${{ secrets.YOUR_PRIVATE_KEY }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ...
