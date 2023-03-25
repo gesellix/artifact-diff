@@ -25,12 +25,14 @@ go install github.com/gesellix/artifact-diff/cmd/artifact-diff@latest
 Please ensure that the binary is executable and in your `$PATH`.
 
 ```shell
-artifact-diff <report directory> <path1> [path2]
+artifact-diff -t <report directory> scan -s <path1> [-s pathN]
 ```
 
-- `report directory`: The reports for `path1` and optionally `path2` will be written to the report directory
-- `path1`: A directory or zip-compatible archive to be examined
-- `path2` (_optional_): Another directory or zip-compatible archive to be examined
+- `report directory`: The reports for `path1` and optionally `pathN` will be written to the report directory
+- `path1`: A directory or zip-compatible archive to be scanned
+- `pathN` (_optional_): Other directories or zip-compatible archives to be scanned
+
+You can use `artifact-diff -h` to see a complete list of options.
 
 ## Good to Know
 
