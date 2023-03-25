@@ -6,73 +6,59 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"sort"
 	"strings"
 )
 
-type FileInfo struct {
-	Path     string `json:"path" yaml:"path"`
-	Filesize int64  `json:"filesize" yaml:"filesize"`
-	Checksum string `json:"checksum" yaml:"checksum"`
-}
+func CollectFileInfos(path string) (*ArtifactInfo, error) {
+	log.Println("Scanning", path)
 
-func (fi *FileInfo) String() string {
-	return fmt.Sprintf("path=%s, filesize=%v, checksum=%s", fi.Path, fi.Filesize, fi.Checksum)
-}
-
-type FileInfos map[string]*FileInfo
-
-func (i FileInfos) String() string {
-	values := make([]string, 0, len(i))
-	for _, info := range i {
-		values = append(values, info.String())
+	stat, err := os.Stat(path)
+	if err != nil {
+		return nil, err
 	}
-	return fmt.Sprintf(strings.Join(values, ""))
-}
-
-type Diff struct {
-	Path      string    `json:"path" yaml:"path"`
-	Count     int       `json:"count" yaml:"count"`
-	FileInfos FileInfos `json:"fileInfos" yaml:"fileInfos"`
-}
-
-type FlatDiff struct {
-	Path      string      `json:"path" yaml:"path"`
-	Count     int         `json:"count" yaml:"count"`
-	FileInfos []*FileInfo `json:"fileInfos" yaml:"fileInfos"`
-}
-
-func (d *Diff) WithFlattenedAndSortedFileInfos() *FlatDiff {
-	flat := &FlatDiff{
-		Path:  d.Path,
-		Count: d.Count,
+	var result *ArtifactInfo
+	if stat.IsDir() {
+		result, err = WalkTree(
+			path,
+			os.DirFS(path),
+		)
+		if err != nil {
+			return nil, err
+		}
+		normalizedFiles := getNormalizedPaths(path, "", result)
+		result = normalizedFiles
+	} else if strings.HasSuffix(path, ".zip") || strings.HasSuffix(path, ".jar") {
+		result, err = WalkArchive(
+			".",
+			path,
+		)
+		if err != nil {
+			return nil, err
+		}
+		normalizedFiles := getNormalizedPaths(path, "zip", result)
+		result = normalizedFiles
 	}
+	result.Path = path
+	return result, nil
+}
 
-	infos := make([]*FileInfo, 0, len(d.FileInfos))
-	for _, f := range d.FileInfos {
-		infos = append(infos, f)
+func getNormalizedPaths(prefix string, replacement string, result *ArtifactInfo) *ArtifactInfo {
+	normalizedFiles := &ArtifactInfo{
+		Count:     result.Count,
+		FileInfos: FileInfos{},
 	}
-	sort.Slice(infos, func(i, j int) bool {
-		return infos[i].Path < infos[j].Path
-	})
-	flat.FileInfos = infos
-	return flat
-}
-
-func (d *Diff) AddFileInfo(path string, info *FileInfo) {
-	pathMd5 := Md5hash(path)
-	if _, ok := d.FileInfos[pathMd5]; ok {
-		log.Println(fmt.Sprintf("duplicate path for %s?", path))
+	for _, v := range result.FileInfos {
+		// make the f.Path look like 'path/to/content.txt'
+		// so that we can compare relative paths regardless of the prefix
+		//v.Path = fmt.Sprintf("%s%s", replacement, filepath.ToSlash(strings.TrimPrefix(v.Path, prefix)))
+		v.Path = fmt.Sprintf("%s%s", replacement, filepath.ToSlash(strings.TrimPrefix(filepath.ToSlash(v.Path), filepath.ToSlash(prefix))))
+		normalizedFiles.AddFileInfo(v.Path, v)
 	}
-	d.FileInfos[pathMd5] = info
+	return normalizedFiles
 }
 
-func (d *Diff) String() string {
-	return fmt.Sprintf("Count=%v, FileInfos=%v", d.Count, d.FileInfos)
-}
-
-func WalkTree(root string, rootFS fs.FS) (*Diff, error) {
-	diff := Diff{
+func WalkTree(root string, rootFS fs.FS) (*ArtifactInfo, error) {
+	diff := ArtifactInfo{
 		FileInfos: FileInfos{},
 	}
 	err := fs.WalkDir(rootFS, ".", func(p string, d fs.DirEntry, err error) error {
@@ -113,7 +99,7 @@ func WalkTree(root string, rootFS fs.FS) (*Diff, error) {
 	return &diff, err
 }
 
-func WalkArchive(root string, zip string) (*Diff, error) {
+func WalkArchive(root string, zip string) (*ArtifactInfo, error) {
 	temp, err := os.MkdirTemp(
 		"",
 		fmt.Sprintf("artifact-diff_unzipped_%s",
@@ -147,7 +133,7 @@ func WalkArchive(root string, zip string) (*Diff, error) {
 	if err != nil {
 		return nil, err
 	}
-	normalizedFiles := &Diff{
+	normalizedFiles := &ArtifactInfo{
 		Count:     files.Count,
 		FileInfos: FileInfos{},
 	}

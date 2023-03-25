@@ -7,7 +7,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"strings"
 
 	diff "github.com/gesellix/artifact-diff"
 )
@@ -24,7 +23,7 @@ func main() {
 	}
 
 	leftRoot := filepath.Clean(os.Args[2])
-	leftResult, err := collectFileInfos(leftRoot)
+	leftResult, err := diff.CollectFileInfos(leftRoot)
 	if err != nil {
 		panic(err)
 	}
@@ -32,7 +31,7 @@ func main() {
 
 	if len(os.Args) > 3 {
 		rightRoot := filepath.Clean(os.Args[3])
-		rightResult, err := collectFileInfos(rightRoot)
+		rightResult, err := diff.CollectFileInfos(rightRoot)
 		if err != nil {
 			panic(err)
 		}
@@ -69,55 +68,7 @@ func prepareReportDirectory(reportDir string) (string, error) {
 	return dir, nil
 }
 
-func collectFileInfos(path string) (*diff.Diff, error) {
-	log.Println("Scanning", path)
-
-	stat, err := os.Stat(path)
-	if err != nil {
-		return nil, err
-	}
-	var result *diff.Diff
-	if stat.IsDir() {
-		result, err = diff.WalkTree(
-			path,
-			os.DirFS(path),
-		)
-		if err != nil {
-			return nil, err
-		}
-		normalizedFiles := getNormalizedPaths(path, "", result)
-		result = normalizedFiles
-	} else if strings.HasSuffix(path, ".zip") || strings.HasSuffix(path, ".jar") {
-		result, err = diff.WalkArchive(
-			".",
-			path,
-		)
-		if err != nil {
-			return nil, err
-		}
-		normalizedFiles := getNormalizedPaths(path, "zip", result)
-		result = normalizedFiles
-	}
-	result.Path = path
-	return result, nil
-}
-
-func getNormalizedPaths(prefix string, replacement string, result *diff.Diff) *diff.Diff {
-	normalizedFiles := &diff.Diff{
-		Count:     result.Count,
-		FileInfos: diff.FileInfos{},
-	}
-	for _, v := range result.FileInfos {
-		// make the f.Path look like 'path/to/content.txt'
-		// so that we can compare relative paths regardless of the prefix
-		//v.Path = fmt.Sprintf("%s%s", replacement, filepath.ToSlash(strings.TrimPrefix(v.Path, prefix)))
-		v.Path = fmt.Sprintf("%s%s", replacement, filepath.ToSlash(strings.TrimPrefix(filepath.ToSlash(v.Path), filepath.ToSlash(prefix))))
-		normalizedFiles.AddFileInfo(v.Path, v)
-	}
-	return normalizedFiles
-}
-
-func writeReport(reportDir string, path string, infos *diff.Diff) {
+func writeReport(reportDir string, path string, infos *diff.ArtifactInfo) {
 	log.Println("Writing report to", reportDir)
 
 	flat := infos.WithFlattenedAndSortedFileInfos()
