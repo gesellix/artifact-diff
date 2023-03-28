@@ -3,7 +3,7 @@ module github.com/gesellix/artifact-diff
 go 1.18
 
 require (
-	github.com/urfave/cli/v2 v2.25.0
+	github.com/urfave/cli/v2 v2.25.1
 	gopkg.in/yaml.v3 v3.0.1
 )
 
