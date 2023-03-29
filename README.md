@@ -3,7 +3,7 @@
 Compare directories and zip/jar artifacts.
 
 Artifact Diff helps to create reports in plain text, so a generic diff tool can highlight
-differences between to paths or archives.
+differences between two paths or archives.
 
 Reports will be written in JSON, and YAML format.
 
