@@ -14,6 +14,7 @@ func _TestWriteJarFile(t *testing.T) {
 func TestUnzipJarFile(t *testing.T) {
 	t.Parallel()
 	err := diff.Unzip("testdata/jarfiles/minimal.jar", "testdata/_tmp")
+	defer os.RemoveAll("testdata/_tmp")
 	if err != nil {
 		t.Errorf("unzip failed: %v", err)
 	}
