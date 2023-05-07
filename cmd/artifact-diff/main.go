@@ -61,9 +61,12 @@ func main() {
 			leftRoot := filepath.Clean(path)
 			leftResult, err := diff.CollectFileInfos(leftRoot)
 			if err != nil {
-				panic(err)
+				return err
 			}
-			writeReport(reportDir, fmt.Sprintf("path1-%s", leftRoot), leftResult)
+			err = writeReport(reportDir, fmt.Sprintf("path1-%s", leftRoot), leftResult)
+			if err != nil {
+				return err
+			}
 		}
 		return nil
 	}
@@ -129,28 +132,43 @@ func prepareReportDirectory(reportDir string) (string, error) {
 	return dir, nil
 }
 
-func writeReport(reportDir string, path string, infos *diff.ArtifactInfo) {
+func writeReport(reportDir string, path string, infos *diff.ArtifactInfo) error {
 	log.Println("Writing report to", reportDir)
 
 	flat := infos.WithFlattenedAndSortedFileInfos()
 
 	_, file := filepath.Split(path)
-	writeJson(reportDir, file, flat)
-	writeYaml(reportDir, file, flat)
+	err := writeYaml(reportDir, file, flat)
+	if err != nil {
+		return err
+	}
+	err = writeJson(reportDir, file, flat)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func writeYaml(reportDir string, file string, content interface{}) {
+func writeYaml(reportDir string, file string, content interface{}) error {
 	yamlResult, _ := yaml.Marshal(content)
 	filename := fmt.Sprintf("%s.yaml", filepath.Join(reportDir, file))
-	os.WriteFile(filename, yamlResult, 0644)
+	err := os.WriteFile(filename, yamlResult, 0644)
+	if err != nil {
+		return err
+	}
 	log.Println("Report (yaml) written to", filename)
 	//log.Println(string(yamlResult))
+	return nil
 }
 
-func writeJson(reportDir string, file string, content interface{}) {
+func writeJson(reportDir string, file string, content interface{}) error {
 	jsonResult, _ := json.Marshal(content)
 	filename := fmt.Sprintf("%s.json", filepath.Join(reportDir, file))
-	os.WriteFile(filename, jsonResult, 0644)
+	err := os.WriteFile(filename, jsonResult, 0644)
+	if err != nil {
+		return err
+	}
 	log.Println("Report (json) written to", filename)
 	//fmt.Println(string(jsonResult))
+	return nil
 }
