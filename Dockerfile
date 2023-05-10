@@ -17,7 +17,7 @@ RUN cd $APPPATH && go get -d \
     -o /bin/main \
     github.com/gesellix/artifact-diff/cmd/artifact-diff
 
-FROM alpine:3.17.3
+FROM alpine:3.18.0
 LABEL maintainer="Tobias Gesellchen <tobias@gesellix.de> (@gesellix)"
 
 ENTRYPOINT [ "/main" ]
