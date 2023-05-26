@@ -3,17 +3,18 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/urfave/cli/v2"
+	"golang.org/x/exp/slices"
 	"gopkg.in/yaml.v3"
 	"log"
 	"os"
 	"path/filepath"
 
-	"github.com/urfave/cli/v2"
-
 	diff "github.com/gesellix/artifact-diff"
 )
 
 func main() {
+	supportedFormats := []string{"json", "yaml"}
 	cliFlags := []cli.Flag{
 		&cli.StringFlag{
 			Name:    "reportdir",
@@ -27,6 +28,23 @@ func main() {
 					return fmt.Errorf("failed to prepare the report directory %s: %w", dir, err)
 				}
 				fmt.Println("the report will be written to", dir)
+				return nil
+			},
+		},
+		&cli.StringSliceFlag{
+			Name:     "reportformat",
+			Aliases:  []string{"f"},
+			Usage:    fmt.Sprintf("Report format. Supported formats are: %v", supportedFormats),
+			EnvVars:  []string{"REPORT_FORMAT", "REPORTFORMAT"},
+			Required: false,
+			Value:    cli.NewStringSlice("yaml"),
+			Action: func(ctx *cli.Context, formats []string) error {
+				for _, format := range formats {
+					if !slices.Contains(supportedFormats, format) {
+						return fmt.Errorf("unsupported report format %s. Supported formats: %v", format, supportedFormats)
+					}
+					fmt.Println("report will be written as:", format)
+				}
 				return nil
 			},
 		},
@@ -55,6 +73,7 @@ func main() {
 	}
 	actionScan := func(ctx *cli.Context) error {
 		reportDir := ctx.String("reportdir")
+		reportFormats := ctx.StringSlice("reportformat")
 		sourcepaths := ctx.StringSlice("sourcepath")
 
 		for _, path := range sourcepaths {
@@ -63,7 +82,7 @@ func main() {
 			if err != nil {
 				return err
 			}
-			err = writeReport(reportDir, fmt.Sprintf("path1-%s", leftRoot), leftResult)
+			err = writeReport(reportDir, reportFormats, fmt.Sprintf("path1-%s", leftRoot), leftResult)
 			if err != nil {
 				return err
 			}
@@ -132,20 +151,27 @@ func prepareReportDirectory(reportDir string) (string, error) {
 	return dir, nil
 }
 
-func writeReport(reportDir string, path string, infos *diff.ArtifactInfo) error {
+func writeReport(reportDir string, reportFormats []string, path string, infos *diff.ArtifactInfo) error {
 	log.Println("Writing report to", reportDir)
 
 	flat := infos.WithFlattenedAndSortedFileInfos()
 
 	_, file := filepath.Split(path)
-	err := writeYaml(reportDir, file, flat)
-	if err != nil {
-		return err
+
+	if slices.Contains(reportFormats, "yaml") {
+		err := writeYaml(reportDir, file, flat)
+		if err != nil {
+			return err
+		}
 	}
-	err = writeJson(reportDir, file, flat)
-	if err != nil {
-		return err
+
+	if slices.Contains(reportFormats, "json") {
+		err := writeJson(reportDir, file, flat)
+		if err != nil {
+			return err
+		}
 	}
+
 	return nil
 }
 
