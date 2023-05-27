@@ -27,7 +27,7 @@ func main() {
 				if err != nil {
 					return fmt.Errorf("failed to prepare the report directory %s: %w", dir, err)
 				}
-				fmt.Println("the report will be written to", dir)
+				log.Println("the report will be written to", dir)
 				return nil
 			},
 		},
@@ -43,7 +43,7 @@ func main() {
 					if !slices.Contains(supportedFormats, format) {
 						return fmt.Errorf("unsupported report format %s. Supported formats: %v", format, supportedFormats)
 					}
-					fmt.Println("report will be written as:", format)
+					log.Println("the report will be written as:", format)
 				}
 				return nil
 			},
@@ -65,7 +65,7 @@ func main() {
 						}
 						return fmt.Errorf("invalid path %s: %w", path, err)
 					}
-					fmt.Println("path to be scanned:", path)
+					log.Println("path to be scanned:", path)
 				}
 				return nil
 			},
@@ -147,12 +147,12 @@ func prepareReportDirectory(reportDir string) (string, error) {
 			return "", err
 		}
 	}
-	//log.Println("Reports will be written to", dir)
+	//log.Println("reports will be written to", dir)
 	return dir, nil
 }
 
 func writeReport(reportDir string, reportFormats []string, path string, infos *diff.ArtifactInfo) error {
-	log.Println("Writing report to", reportDir)
+	log.Println("writing report to", reportDir)
 
 	flat := infos.WithFlattenedAndSortedFileInfos()
 
@@ -182,7 +182,7 @@ func writeYaml(reportDir string, file string, content interface{}) error {
 	if err != nil {
 		return err
 	}
-	log.Println("Report (yaml) written to", filename)
+	log.Println("report (yaml) written to", filename)
 	//log.Println(string(yamlResult))
 	return nil
 }
@@ -194,7 +194,7 @@ func writeJson(reportDir string, file string, content interface{}) error {
 	if err != nil {
 		return err
 	}
-	log.Println("Report (json) written to", filename)
+	log.Println("report (json) written to", filename)
 	//fmt.Println(string(jsonResult))
 	return nil
 }
