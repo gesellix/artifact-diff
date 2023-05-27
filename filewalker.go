@@ -10,7 +10,7 @@ import (
 )
 
 func CollectFileInfos(path string) (*ArtifactInfo, error) {
-	log.Println("Scanning", path)
+	log.Println("scanning", path)
 
 	stat, err := os.Stat(path)
 	if err != nil {
