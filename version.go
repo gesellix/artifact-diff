@@ -4,10 +4,10 @@ import "fmt"
 
 var (
 	version        = "dev"
-	commitHash     = "n/a"
+	commit         = "n/a"
 	buildTimestamp = "n/a"
 )
 
 func BuildVersion() string {
-	return fmt.Sprintf("%s-%s (%s)", version, commitHash, buildTimestamp)
+	return fmt.Sprintf("%s-%s (%s)", version, commit, buildTimestamp)
 }
