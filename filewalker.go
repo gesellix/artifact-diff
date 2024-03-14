@@ -9,6 +9,14 @@ import (
 	"strings"
 )
 
+type unarchiver func(string, string) error
+
+var unarchiverByExt = map[string]unarchiver{
+	".zip": Unzip,
+	".jar": Unzip,
+	".gz":  Untar,
+}
+
 func CollectFileInfos(path string) (*ArtifactInfo, error) {
 	log.Println("scanning", path)
 
@@ -27,15 +35,17 @@ func CollectFileInfos(path string) (*ArtifactInfo, error) {
 		}
 		normalizedFiles := getNormalizedPaths(path, "", result)
 		result = normalizedFiles
-	} else if strings.HasSuffix(path, ".zip") || strings.HasSuffix(path, ".jar") {
+	} else if strings.HasSuffix(path, ".zip") || strings.HasSuffix(path, ".jar") || strings.HasSuffix(path, ".gz") {
+		extension := filepath.Ext(path)
 		result, err = WalkArchive(
 			".",
 			path,
+			unarchiverByExt[extension],
 		)
 		if err != nil {
 			return nil, err
 		}
-		normalizedFiles := getNormalizedPaths(path, "zip", result)
+		normalizedFiles := getNormalizedPaths(path, extension[1:], result)
 		result = normalizedFiles
 	}
 	result.Path = path
@@ -73,7 +83,7 @@ func WalkTree(root string, rootFS fs.FS) (*ArtifactInfo, error) {
 		info := getFileInfo(path)
 		diff.AddFileInfo(path, info)
 
-		if filepath.Ext(p) == ".zip" || filepath.Ext(p) == ".jar" {
+		if filepath.Ext(p) == ".zip" || filepath.Ext(p) == ".jar" || filepath.Ext(p) == ".gz" {
 			// TODO zip in zip won't work?
 			//archiveFs, err := zip.OpenReader(p)
 			//if err != nil {
@@ -83,7 +93,7 @@ func WalkTree(root string, rootFS fs.FS) (*ArtifactInfo, error) {
 			// //var AppFs = afero.NewMemMapFs()
 			// //var AppFs = afero.NewOsFs()
 
-			archiveDiff, err := WalkArchive(root, p)
+			archiveDiff, err := WalkArchive(root, p, unarchiverByExt[filepath.Ext(p)])
 			if err != nil {
 				log.Println(fmt.Sprintf("error walking archive: %v", err))
 				return err
@@ -99,7 +109,7 @@ func WalkTree(root string, rootFS fs.FS) (*ArtifactInfo, error) {
 	return &diff, err
 }
 
-func WalkArchive(root string, zip string) (*ArtifactInfo, error) {
+func WalkArchive(root string, zip string, unarchiver unarchiver) (*ArtifactInfo, error) {
 	temp, err := os.MkdirTemp(
 		"",
 		fmt.Sprintf("artifact-diff_unzipped_%s",
@@ -116,7 +126,7 @@ func WalkArchive(root string, zip string) (*ArtifactInfo, error) {
 	if !filepath.IsAbs(zip) {
 		absSrc, _ = filepath.Abs(fmt.Sprintf("%s/%s", root, zip))
 	}
-	err = Unzip(absSrc, temp)
+	err = unarchiver(absSrc, temp)
 	if err != nil {
 		log.Println(fmt.Sprintf("unzip err %v", err))
 		return nil, nil

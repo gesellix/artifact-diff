@@ -90,7 +90,7 @@ func TestFileInfoOnDiskAndInZIP(t *testing.T) {
 func TestWalkArchive(t *testing.T) {
 	t.Parallel()
 	leftRoot := filepath.Clean("testdata/findgo-with-zip/findgo.zip")
-	got, _ := diff.WalkArchive(".", leftRoot)
+	got, _ := diff.WalkArchive(".", leftRoot, diff.Unzip)
 	found := false
 	for _, v := range got.FileInfos {
 		normalized := filepath.ToSlash(v.Path)

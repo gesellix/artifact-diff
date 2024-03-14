@@ -27,3 +27,20 @@ func TestUnzipJarFile(t *testing.T) {
 		t.Errorf("expected %s to have a size of %v, but got %v", "testdata/_tmp/a.txt", 1, stat.Size())
 	}
 }
+
+func TestUnzipTarFile(t *testing.T) {
+	t.Parallel()
+	err := diff.Untar("testdata/tarfiles/minimal.tar.gz", "testdata/_tmp")
+	defer os.RemoveAll("testdata/_tmp")
+	if err != nil {
+		t.Errorf("untar failed: %v", err)
+	}
+	stat, err := os.Stat("testdata/_tmp/a.txt")
+	if err != nil {
+		t.Errorf("stat on %s failed: %v", "testdata/_tmp/a.txt", err)
+	}
+
+	if stat.Size() != 13 {
+		t.Errorf("expected %s to have a size of %v, but got %v", "testdata/_tmp/a.txt", 1, stat.Size())
+	}
+}
