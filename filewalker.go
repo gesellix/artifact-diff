@@ -14,7 +14,8 @@ type unarchiver func(string, string) error
 var unarchiverByExt = map[string]unarchiver{
 	".zip": Unzip,
 	".jar": Unzip,
-	".gz":  Untar,
+	".tar": Untar,
+	".gz":  Gunzip,
 }
 
 func CollectFileInfos(path string) (*ArtifactInfo, error) {
