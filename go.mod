@@ -3,7 +3,7 @@ module github.com/gesellix/artifact-diff
 go 1.21
 
 require (
-	github.com/urfave/cli/v2 v2.27.1
+	github.com/urfave/cli/v2 v2.27.2
 	golang.org/x/exp v0.0.0-20230522175609-2e198f4a06a1
 	golift.io/xtractr v0.2.2
 	gopkg.in/yaml.v3 v3.0.1
@@ -15,7 +15,7 @@ require (
 	github.com/bodgit/sevenzip v1.4.0 // indirect
 	github.com/bodgit/windows v1.0.1 // indirect
 	github.com/connesc/cipherio v0.2.1 // indirect
-	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
+	github.com/cpuguy83/go-md2man/v2 v2.0.4 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/kdomanski/iso9660 v0.3.3 // indirect
@@ -24,7 +24,7 @@ require (
 	github.com/pierrec/lz4/v4 v4.1.17 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/ulikunitz/xz v0.5.11 // indirect
-	github.com/xrash/smetrics v0.0.0-20201216005158-039620a65673 // indirect
+	github.com/xrash/smetrics v0.0.0-20240312152122-5f08fbb34913 // indirect
 	go4.org v0.0.0-20230225012048-214862532bf5 // indirect
 	golang.org/x/text v0.8.0 // indirect
 )
