@@ -11,7 +11,7 @@ builds:
       - CGO_ENABLED=0
     # Default is `-s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.Date}} -X main.builtBy=goreleaser`.
     ldflags:
-      - -s -w -extldflags "-static" -X github.com/gesellix/artifact-diff.version={{.Version}} -X github.com/gesellix/artifact-diff.commit={{.ShortCommit}} -X github.com/gesellix/artifact-diff.buildTimestamp={{.Date}} -X github.com/gesellix/artifact-diff.builtBy=goreleaser`
+      - -s -w -extldflags "-static" -X github.com/gesellix/artifact-diff.version={{.Version}} -X github.com/gesellix/artifact-diff.commit={{.ShortCommit}} -X github.com/gesellix/artifact-diff.buildTimestamp={{.Date}} -X github.com/gesellix/artifact-diff.builtBy=goreleaser
     goos:
       - darwin
       - linux
@@ -26,9 +26,8 @@ builds:
     ignore:
       - goos: darwin
         goarch: "386"
-      - goos: linux
+      - goos: windows
         goarch: arm
-        goarm: "7"
 release:
   draft: true
 archives:
