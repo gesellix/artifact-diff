@@ -106,3 +106,21 @@ func TestArtifactInfo_WithFlattenedAndSortedFileInfos(t *testing.T) {
 		})
 	}
 }
+
+func TestFileInfos_String(t *testing.T) {
+	fileInfos := FileInfos{
+		"a": &FileInfo{Path: "a", Filesize: 10, Checksum: "abc"},
+		"b": &FileInfo{Path: "b", Filesize: 20, Checksum: "def"},
+	}
+	// Note: maps in Go have non-deterministic iteration order, so we check if both strings are present
+	s := fileInfos.String()
+	expectedA := "path=a, filesize=10, checksum=abc"
+	expectedB := "path=b, filesize=20, checksum=def"
+
+	if !reflect.DeepEqual(len(s), len(expectedA)+len(expectedB)) {
+		t.Errorf("FileInfos.String() length = %d, want %d", len(s), len(expectedA)+len(expectedB))
+	}
+	if !reflect.DeepEqual(s[:len(expectedA)] == expectedA || s[:len(expectedB)] == expectedB, true) {
+		t.Errorf("FileInfos.String() = %v, doesn't contain expected strings", s)
+	}
+}

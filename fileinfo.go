@@ -24,7 +24,7 @@ func (i FileInfos) String() string {
 	for _, info := range i {
 		values = append(values, info.String())
 	}
-	return fmt.Sprintf(strings.Join(values, ""))
+	return strings.Join(values, "")
 }
 
 type ArtifactInfo struct {
