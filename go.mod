@@ -1,6 +1,6 @@
 module github.com/gesellix/artifact-diff
 
-go 1.21
+go 1.26.1
 
 require (
 	github.com/urfave/cli/v2 v2.27.7
