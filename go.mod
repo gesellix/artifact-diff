@@ -5,7 +5,7 @@ go 1.27.1
 require (
 	github.com/urfave/cli/v2 v2.27.7
 	golang.org/x/exp v0.0.0-20260908205506-85c1c2202aba
-	golift.io/xtractr v0.6.0
+	golift.io/xtractr v0.6.1
 	gopkg.in/yaml.v3 v3.0.1
 )
 
