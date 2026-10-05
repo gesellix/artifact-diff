@@ -5,13 +5,13 @@ go 1.27.1
 require (
 	github.com/urfave/cli/v2 v2.27.7
 	golang.org/x/exp v0.0.0-20260908205506-85c1c2202aba
-	golift.io/xtractr v0.6.0
+	golift.io/xtractr v0.7.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
 	github.com/Unpackerr/iso9660 v0.0.3 // indirect
-	github.com/andybalholm/brotli v1.2.3 // indirect
+	github.com/andybalholm/brotli v1.2.4 // indirect
 	github.com/bodgit/plumbing v1.3.0 // indirect
 	github.com/bodgit/sevenzip v1.6.5 // indirect
 	github.com/bodgit/windows v1.0.1 // indirect
@@ -26,17 +26,19 @@ require (
 	github.com/mewpkg/term v0.0.0-20241026122259-37a80af23985 // indirect
 	github.com/nwaples/rardecode/v2 v2.4.1 // indirect
 	github.com/peterebden/ar v0.0.0-20241106141004-20dc11b778e8 // indirect
-	github.com/pierrec/lz4/v4 v4.1.29 // indirect
+	github.com/pierrec/lz4/v4 v4.1.30 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/saintfish/chardet v0.0.0-20230101081208-5e3ef4b5456d // indirect
 	github.com/spf13/afero v1.15.0 // indirect
 	github.com/sshaman1101/dcompress v0.0.0-20200109162717-50436a6332de // indirect
 	github.com/stangelandcl/ppmd v0.1.1 // indirect
 	github.com/therootcompany/xz v1.0.1 // indirect
-	github.com/ulikunitz/xz v0.5.16 // indirect
+	github.com/ulikunitz/xz v0.5.17 // indirect
 	github.com/xrash/smetrics v0.0.0-20250705151800-55b8f293f342 // indirect
 	go4.org v0.0.0-20260112195520-a5071408f32f // indirect
 	golang.org/x/crypto v0.57.0 // indirect
 	golang.org/x/text v0.42.0 // indirect
-	golift.io/udf v0.0.1 // indirect
+	golift.io/ape v0.2.0 // indirect
+	golift.io/asar v0.0.0-20260922041046-6f7004983a76 // indirect
+	golift.io/udf v0.1.0 // indirect
 )
